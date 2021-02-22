@@ -23,25 +23,35 @@ public class CameraListService {
     RestTemplate restTemplate;
     @Autowired
     CopyManagerService copyManagerService;
-    @Value("${test1.url}")
-    public String test1Url;
+    @Value("${camera.queuelengthdet.list.url}")
+    public String queueLengthDetListUrl;
+    @Value("${camera.crowddensitydet.list.url}")
+    public String crowdDensityDetListUrl;
+    @Value("${api.appkey.name}")
+    public String appkeyName;
+    @Value("${api.appkey.value}")
+    public String appkeyValue;
+    @Value("${api.id.name}")
+    public String idName;
+    @Value("${api.id.value}")
+    public String idValue;
 
 
     public void queueLength(){
-        insertCameraList("queueLength");
+        insertCameraList("queueLength",queueLengthDetListUrl);
     }
 
     public void crowdDensityDet(){
-        insertCameraList("crowdDensityDet");
+        insertCameraList("crowdDensityDet",crowdDensityDetListUrl);
     }
 
-    public void insertCameraList(String apiName){
+    private void insertCameraList(String apiName,String url){
         int totalRow;
         //获取总记录数
-        Result rowResult= getCameraInfo(1);
+        Result rowResult= getCameraInfo(1,url);
         if(rowResult!=null&&rowResult.getData()!=null&&rowResult.getData().getTotalRows()!=null){
             totalRow=rowResult.getData().getTotalRows();
-            Result result = getCameraInfo(totalRow);
+            Result result = getCameraInfo(totalRow,url);
             if(result!=null&&result.getData()!=null&&result.getData().getDatas()!=null&&result.getData().getDatas().length>0){
                 List<CameraInfo> cameraInfos = Arrays.asList(result.getData().getDatas());
                 for (CameraInfo info : cameraInfos) {
@@ -52,14 +62,14 @@ public class CameraListService {
         }
     }
 
-    public Result getCameraInfo(Integer pageSize) {
-        String url=test1Url;
+    private Result getCameraInfo(Integer pageSize,String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(appkeyName,appkeyValue);
+        headers.add(idName,idValue);
         JSONObject jsonObj = new JSONObject();
         jsonObj.put("pageSize",pageSize);
         HttpEntity<JSONObject> request = new HttpEntity<>(jsonObj, headers);
-        Result result = restTemplate.postForObject(url, request, Result.class);
-        return result;
+        return restTemplate.postForObject(url, request, Result.class);
     }
 }
