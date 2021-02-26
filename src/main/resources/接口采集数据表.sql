@@ -1,5 +1,5 @@
 --像机列表
-DROP TABLE IF EXISTS "dm"."dm_dyn_camera";
+--DROP TABLE IF EXISTS "dm"."dm_dyn_camera";
 CREATE TABLE "dm"."dm_dyn_camera" (
 "camera_id" varchar(100) COLLATE "pg_catalog"."default" DEFAULT NULL,
 "area_id" varchar(100) COLLATE "pg_catalog"."default" DEFAULT NULL,
@@ -54,7 +54,7 @@ COMMENT ON COLUMN "dm"."dm_dyn_camera"."inserttime" IS '数据插入时间';
 
 
 --人群密度排队长度查询接口
-DROP TABLE IF EXISTS "dm"."dm_dyn_camera_query";
+--DROP TABLE IF EXISTS "dm"."dm_dyn_camera_query";
 CREATE TABLE "dm"."dm_dyn_camera_query" (
 "camera_id" varchar(255) COLLATE "pg_catalog"."default" DEFAULT NULL,
 "camera_name" varchar(255) COLLATE "pg_catalog"."default" DEFAULT NULL,
