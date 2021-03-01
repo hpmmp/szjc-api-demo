@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2021/2/1 11:03
  **/
 @RestController
-@RequestMapping("camera")
+@RequestMapping("/camera")
 public class SendController {
     @Autowired
     CameraListService cameraListService;
