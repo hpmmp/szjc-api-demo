@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,6 +25,8 @@ public class CameraListService {
     @Value("${test1.url}")
     public String test1Url;
 
+    @Autowired
+    DemoData demoData;
 
     public void queueLength(){
         insertCameraList("queueLength");
@@ -36,23 +37,27 @@ public class CameraListService {
     }
 
     public void insertCameraList(String apiName){
-        int totalRow;
-        //获取总记录数
-        Result rowResult= getCameraInfo(1);
-        if(rowResult!=null&&rowResult.getData()!=null&&rowResult.getData().getTotalRows()!=null){
-            totalRow=rowResult.getData().getTotalRows();
-            Result result = getCameraInfo(totalRow);
-            if(result!=null&&result.getData()!=null&&result.getData().getDatas()!=null&&result.getData().getDatas().length>0){
-                List<CameraInfo> cameraInfos = Arrays.asList(result.getData().getDatas());
-                for (CameraInfo info : cameraInfos) {
-                    info.setFlag(apiName);
-                }
-                copyManagerService.insertData(cameraInfos,"dm_dyn_camera_list");
-            }
-        }
+        List<CameraInfo> cameraInfos = demoData.getCameraInfo(apiName);
+        copyManagerService.insertData(cameraInfos,"dm_dyn_camera_list");
+
+
+//        int totalRow;
+//        //获取总记录数
+//        Result rowResult= getCameraInfo(1);
+//        if(rowResult!=null&&rowResult.getData()!=null&&rowResult.getData().getTotalRows()!=null){
+//            totalRow=rowResult.getData().getTotalRows();
+//            Result result = getCameraInfo(totalRow);
+//            if(result!=null&&result.getData()!=null&&result.getData().getDatas()!=null&&result.getData().getDatas().length>0){
+//                List<CameraInfo> cameraInfos = Arrays.asList(result.getData().getDatas());
+//                for (CameraInfo info : cameraInfos) {
+//                    info.setFlag(apiName);
+//                }
+//                copyManagerService.insertData(cameraInfos,"dm_dyn_camera_list");
+//            }
+//        }
     }
 
-    public Result getCameraInfo(Integer pageSize) {
+    public Result getCameraInfo(String pageSize) {
         String url=test1Url;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

@@ -11,10 +11,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @date 2021/2/5 11:23
@@ -36,36 +37,44 @@ public class CameraQueryService {
     RedisUtil redisUtil;
     @Value("${test2.url}")
     public String test2Url;
+    @Autowired
+    DemoData demoData;
 
 
     @Scheduled(cron = "0 0/2 * * * ?")
     public void queueLengthDetQuery() {
+        System.out.println("queueLengthDetQuery");
         insertCameraQuery("queue_length_det_query","dm_dyn_camera_query", 2);
     }
 
     @Scheduled(cron = "0 0/2 * * * ?")
     public void crowdDensityDetQuery() {
+        System.out.println("crowdDensityDetQuery");
         insertCameraQuery("crowd_density_det_query","dm_dyn_camera_query", 2);
     }
 
     private void insertCameraQuery(String redisName,String tableName,int headCount) {
-        String time = redisUtil.getString(redisName);
-        if(StringUtils.isEmpty(time)){
-            Calendar instance = Calendar.getInstance();
-            instance.add(Calendar.MINUTE,-5);
-            if (!redisUtil.exists(redisName)) {
-                redisUtil.setString(redisName,String.valueOf(instance.getTimeInMillis()), 300);//设置过期时间为5分钟
-            }
-            insertCameraQuery(redisName,tableName,headCount);
-        }else{
-            Calendar instance = Calendar.getInstance();
-            long currentTime = instance.getTimeInMillis();
-            System.out.println(redisName+"--"+time+"--"+new Date(Long.parseLong(time)));
-            System.out.println("currentTime--"+currentTime+"--"+new Date(currentTime));
-            List<CameraQuery> list = queryCamera(Long.parseLong(time), currentTime,redisName,headCount);
-            copyManagerService.insertData(list,tableName);
-            redisUtil.setString(redisName,String.valueOf(currentTime+1), 300);//设置过期时间为5分钟
-        }
+        List<CameraQuery> list = demoData.getCameraQuery(redisName,headCount);
+        copyManagerService.insertData(list,tableName);
+
+
+//        String time = redisUtil.getString(redisName);
+//        if(StringUtils.isEmpty(time)){
+//            Calendar instance = Calendar.getInstance();
+//            instance.add(Calendar.MINUTE,-5);
+//            if (!redisUtil.exists(redisName)) {
+//                redisUtil.setString(redisName,String.valueOf(instance.getTimeInMillis()), 300);//设置过期时间为5分钟
+//            }
+//            insertCameraQuery(redisName,tableName,headCount);
+//        }else{
+//            Calendar instance = Calendar.getInstance();
+//            long currentTime = instance.getTimeInMillis();
+//            System.out.println(redisName+"--"+time+"--"+new Date(Long.parseLong(time)));
+//            System.out.println("currentTime--"+currentTime+"--"+new Date(currentTime));
+//            List<CameraQuery> list = queryCamera(Long.parseLong(time), currentTime,redisName,headCount);
+//            copyManagerService.insertData(list,tableName);
+//            redisUtil.setString(redisName,String.valueOf(currentTime+1), 300);//设置过期时间为5分钟
+//        }
     }
 
     private List<CameraQuery> queryCamera(long start,long end,String RedisName,int head){
