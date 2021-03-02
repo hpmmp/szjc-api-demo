@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -36,9 +37,13 @@ public class CameraQueryService {
     @Value("${test2.url}")
     public String test2Url;
 
+
+    @Scheduled(cron = "0 0/2 * * * ?")
     public void queueLengthDetQuery() {
         insertCameraQuery("queue_length_det_query","dm_dyn_camera_query", 2);
     }
+
+    @Scheduled(cron = "0 0/2 * * * ?")
     public void crowdDensityDetQuery() {
         insertCameraQuery("crowd_density_det_query","dm_dyn_camera_query", 2);
     }
@@ -55,7 +60,7 @@ public class CameraQueryService {
         }else{
             Calendar instance = Calendar.getInstance();
             long currentTime = instance.getTimeInMillis();
-            System.out.println("redis--"+time+"--"+new Date(Long.parseLong(time)));
+            System.out.println(redisName+"--"+time+"--"+new Date(Long.parseLong(time)));
             System.out.println("currentTime--"+currentTime+"--"+new Date(currentTime));
             List<CameraQuery> list = queryCamera(Long.parseLong(time), currentTime,redisName,headCount);
             copyManagerService.insertData(list,tableName);
