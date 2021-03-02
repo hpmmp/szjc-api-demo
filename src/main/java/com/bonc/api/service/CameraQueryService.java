@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -57,9 +58,12 @@ public class CameraQueryService {
     public String idValue;
 
 
+    @Scheduled(cron = "0 0/2 * * * ?")
     public void queueLengthDetQuery() {
         insertCameraQuery(queueLengthDetQueryUrl,queueLengthDetRedisKey, Integer.parseInt(queueHeadCount));
     }
+
+    @Scheduled(cron = "0 0/2 * * * ?")
     public void crowdDensityDetQuery() {
         insertCameraQuery(crowdDensityDetQueryUrl,crowdDensityDetRedisKey, Integer.parseInt(crowdHeadCount));
     }
